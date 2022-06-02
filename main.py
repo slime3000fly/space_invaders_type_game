@@ -34,15 +34,15 @@ y_pong = 720
 x_pong_2 = 5
 y_pong_2 = 360
 
-velocity = 5
-bullet_velocity = 30
+velocity = 3
+bullet_velocity = 15
 
 initial_x_bullet = 530
 initial_y_bullet = 355
 
 bullet = [0] * 10
 bullet_number = 0
-
+fps = 120
 
 dupa = ''
 dupa2 = ''
@@ -55,6 +55,9 @@ bullet_direction = 'UP'
 change_to = bullet_direction
 bullet_state = 'NOT_RENDER'
 change_bullet_state_to = bullet_state
+
+enemy_state = 'RENDER'
+
 
 wall_left = pygame.Rect(0, 0, 5, 740)
 wall_right = pygame.Rect(1075, 0, 10, 740)
@@ -149,19 +152,25 @@ while not done:
     # drawing elements
     pygame.draw.rect(screen, red, wall_right)
     pygame.draw.rect(screen, red, wall_left)
+    bullet = pygame.Rect(x_bullet, y_bullet, 10, 10)
+    enemy_rect = pygame.Rect(1080/2, 720/2, 10, 20)
     player_rect = pygame.Rect(x_pong, y_pong, 20, 30)
     player_rect.center = (x_pong, 700)
     pygame.draw.rect(screen, white, player_rect)
+    if enemy_state == 'RENDER':
+        pygame.draw.rect(screen, white, enemy_rect)
 
     # drawing score
     show_score(1, white, 'times new roman', 20)
     pygame.display.flip()
     screen.fill(black)
     # collisions
+    if pygame.Rect.colliderect(bullet, enemy_rect):
+        enemy_state = 'NOT_RENDER'
 
-    # Moving the bullet
+    #Moving the bullet
     if bullet_state == 'RENDER':
-        bullet = pygame.draw.rect(screen, red, pygame.Rect(x_bullet, y_bullet, 10, 10))
+        pygame.draw.rect(screen, red, bullet)
 
     if bullet_direction == 'UP':
         y_bullet -= bullet_velocity
@@ -177,13 +186,10 @@ while not done:
     if score >= ai_score + 5:
         won()
 
-    print (dupa,dupa2,dupa3)
-    dupa, dupa2, dupa3 ='','',''
-
     # saving highest score to highest_score.txt
     f = open('highest_score.txt', 'w')
     f.write(str(highest_score))
     f.close()
 
     # FPS !!!!!
-    fps_controller.tick(60)
+    fps_controller.tick(fps)
