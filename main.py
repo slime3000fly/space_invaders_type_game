@@ -127,23 +127,19 @@ done = False
 
 while not done:
     pressed = pygame.key.get_pressed()
-    # pygame.key.set_repeat(10)
     if pressed[pygame.K_LEFT]:
-        # if x_pong > 0 + 15:
-        #     x_pong -= velocity
-        dupa = 'left'
+        if x_pong > 0 + 15:
+            x_pong -= velocity
     if pressed[pygame.K_RIGHT]:
-        # if x_pong < 1080 - 15:
-        #     x_pong += velocity
-        dupa3 = 'right'
+        if x_pong < 1080 - 15:
+            x_pong += velocity
     if y_bullet < 0:
         if pressed[pygame.K_SPACE]:
-            #     bullet_state = 'RENDER'
-            #     x_bullet = x_pong - 5
-            #     y_bullet = y_pong - 40
-            dupa2 = 'space'
-    # if event.key == pygame.K_ESCAPE:
-    #     done = True
+                bullet_state = 'RENDER'
+                x_bullet = x_pong - 5
+                y_bullet = y_pong - 40
+    if pressed[pygame.K_ESCAPE]:
+        done = True
     for event in pygame.event.get():
 
         # key to control
