@@ -43,6 +43,12 @@ initial_y_bullet = 355
 bullet = [0] * 10
 bullet_number = 0
 
+
+dupa = ''
+dupa2 = ''
+dupa3 = ''
+
+
 x_bullet = 530
 y_bullet = 355
 bullet_direction = 'UP'
@@ -120,24 +126,28 @@ green = (34, 177, 76)
 done = False
 
 while not done:
+    pressed = pygame.key.get_pressed()
+    # pygame.key.set_repeat(10)
+    if pressed[pygame.K_LEFT]:
+        # if x_pong > 0 + 15:
+        #     x_pong -= velocity
+        dupa = 'left'
+    if pressed[pygame.K_RIGHT]:
+        # if x_pong < 1080 - 15:
+        #     x_pong += velocity
+        dupa3 = 'right'
+    if y_bullet < 0:
+        if pressed[pygame.K_SPACE]:
+            #     bullet_state = 'RENDER'
+            #     x_bullet = x_pong - 5
+            #     y_bullet = y_pong - 40
+            dupa2 = 'space'
+    # if event.key == pygame.K_ESCAPE:
+    #     done = True
     for event in pygame.event.get():
 
         # key to control
-        if event.type == pygame.KEYDOWN:
-            pygame.key.set_repeat(10)
-            if event.key == pygame.K_LEFT:
-                if x_pong > 0 + 15:
-                    x_pong -= velocity
-            if event.key == pygame.K_RIGHT:
-                if x_pong < 1080 - 15:
-                    x_pong += velocity
-            if y_bullet < 0:
-                if event.key == pygame.K_SPACE:
-                    bullet_state = 'RENDER'
-                    x_bullet = x_pong - 5
-                    y_bullet = y_pong - 40
-            if event.key == pygame.K_ESCAPE:
-                done = True
+
         if event.type == pygame.QUIT: sys.exit()
 
     # drawing elements
@@ -170,6 +180,9 @@ while not done:
         lose()
     if score >= ai_score + 5:
         won()
+
+    print (dupa,dupa2,dupa3)
+    dupa, dupa2, dupa3 ='','',''
 
     # saving highest score to highest_score.txt
     f = open('highest_score.txt', 'w')
