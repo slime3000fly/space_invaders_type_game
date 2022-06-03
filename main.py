@@ -1,7 +1,7 @@
 # sapce invaiders game with pygame
 # By: angater1 and slime3000fly
 
-import Bullet
+from Bullet import Bullet
 import pygame
 import sys
 from pygame import mixer
@@ -68,7 +68,11 @@ mixer.music.play(-1)
 bang_sound = mixer.Sound('bang.wav')
 score_sound = mixer.Sound('score.wav')
 ai_score_sound = mixer.Sound('ai_score.wav')
-mariusz = Bullet.bullet(screen, 200, 400, 'UP', 800, 2000)
+
+#TODO: Krzychu tu masz stowrzenie obiektu klasy bullet, tu muszisz wywoalyc dajac argumenty jakie to to sobie zoabcz
+#TODO: niektore maja domyslne wartosci inne nie,
+#TODO: w petli gry wywolujesz metode rysuj czyli masz mariusz.draw() i ona rysuje :)
+mariusz = Bullet(screen, 200, 400, 'UP', 800, 2000)
 
 
 

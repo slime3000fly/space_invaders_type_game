@@ -2,7 +2,7 @@
 
 import pygame
 
-class bullet:
+class Bullet:
 
     y=0
     def __init__(self,screen,x_bullet,y_bullet,bullet_direction='UP',width=10,lenght=10,bullet_velocity=15):
