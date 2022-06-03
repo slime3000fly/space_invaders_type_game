@@ -1,6 +1,7 @@
-# pong game with pygame
+# sapce invaiders game with pygame
 # By: angater1 and slime3000fly
 
+import Bullet
 import pygame
 import sys
 from pygame import mixer
@@ -48,7 +49,6 @@ dupa = ''
 dupa2 = ''
 dupa3 = ''
 
-
 x_bullet = 530
 y_bullet = 355
 bullet_direction = 'UP'
@@ -57,7 +57,6 @@ bullet_state = 'NOT_RENDER'
 change_bullet_state_to = bullet_state
 
 enemy_state = 'RENDER'
-
 
 wall_left = pygame.Rect(0, 0, 5, 740)
 wall_right = pygame.Rect(1075, 0, 10, 740)
@@ -69,6 +68,8 @@ mixer.music.play(-1)
 bang_sound = mixer.Sound('bang.wav')
 score_sound = mixer.Sound('score.wav')
 ai_score_sound = mixer.Sound('ai_score.wav')
+mariusz = Bullet.bullet(screen, 200, 400, 'UP', 800, 2000)
+
 
 
 # function declaration
@@ -138,9 +139,9 @@ while not done:
             x_pong += velocity
     if y_bullet < 0:
         if pressed[pygame.K_SPACE]:
-                bullet_state = 'RENDER'
-                x_bullet = x_pong - 5
-                y_bullet = y_pong - 40
+            bullet_state = 'RENDER'
+            x_bullet = x_pong - 5
+            y_bullet = y_pong - 40
     if pressed[pygame.K_ESCAPE]:
         done = True
     for event in pygame.event.get():
@@ -153,7 +154,7 @@ while not done:
     pygame.draw.rect(screen, red, wall_right)
     pygame.draw.rect(screen, red, wall_left)
     bullet = pygame.Rect(x_bullet, y_bullet, 10, 10)
-    enemy_rect = pygame.Rect(1080/2, 720/2, 10, 20)
+    enemy_rect = pygame.Rect(1080 / 2, 720 / 2, 10, 20)
     player_rect = pygame.Rect(x_pong, y_pong, 20, 30)
     player_rect.center = (x_pong, 700)
     pygame.draw.rect(screen, white, player_rect)
@@ -168,7 +169,7 @@ while not done:
     if pygame.Rect.colliderect(bullet, enemy_rect):
         enemy_state = 'NOT_RENDER'
 
-    #Moving the bullet
+    # Moving the bullet
     if bullet_state == 'RENDER':
         pygame.draw.rect(screen, red, bullet)
 
@@ -193,3 +194,7 @@ while not done:
 
     # FPS !!!!!
     fps_controller.tick(fps)
+
+    print(mariusz.draw())
+    if (mariusz.draw() <= 300):print('sprawdzam')
+
