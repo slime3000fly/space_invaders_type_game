@@ -36,7 +36,7 @@ x_pong_2 = 5
 y_pong_2 = 360
 
 velocity = 3
-bullet_velocity = 15
+bullet_velocity = 5
 
 initial_x_bullet = 530
 initial_y_bullet = 355
@@ -45,9 +45,6 @@ bullet = [0] * 10
 bullet_number = 0
 fps = 120
 
-dupa = ''
-dupa2 = ''
-dupa3 = ''
 
 x_bullet = 530
 y_bullet = 355
@@ -69,12 +66,14 @@ bang_sound = mixer.Sound('bang.wav')
 score_sound = mixer.Sound('score.wav')
 ai_score_sound = mixer.Sound('ai_score.wav')
 
-#TODO: Krzychu tu masz stowrzenie obiektu klasy bullet, tu muszisz wywoalyc dajac argumenty jakie to to sobie zoabcz
-#TODO: niektore maja domyslne wartosci inne nie,
-#TODO: w petli gry wywolujesz metode rysuj czyli masz mariusz.draw() i ona rysuje :)
-mariusz = Bullet(screen, 200, 400, 'UP', 800, 2000)
+# TODO: Krzychu tu masz stowrzenie obiektu klasy bullet, tu muszisz wywoalyc dajac argumenty jakie to to sobie zoabcz
+# TODO: niektore maja domyslne wartosci inne nie,
+# TODO: w petli gry wywolujesz metode rysuj czyli masz mariusz.draw() i ona rysuje :)
+mariusz = Bullet(screen, 'UP', 80, 20, bullet_velocity)
 
-
+bullets = [Bullet(screen, 'UP', 80, 20, bullet_velocity), Bullet(screen, 'UP', 80, 200, bullet_velocity)]
+bullets_state = ['NORENDER', 'NORENDER']
+ticks_to_ignore = 0
 
 # function declaration
 def show_score(choice, color, font, size):
@@ -134,6 +133,7 @@ green = (34, 177, 76)
 done = False
 
 while not done:
+    # key to control
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_LEFT]:
         if x_pong > 0 + 15:
@@ -141,23 +141,26 @@ while not done:
     if pressed[pygame.K_RIGHT]:
         if x_pong < 1080 - 15:
             x_pong += velocity
-    if y_bullet < 0:
-        if pressed[pygame.K_SPACE]:
-            bullet_state = 'RENDER'
-            x_bullet = x_pong - 5
-            y_bullet = y_pong - 40
+            for i in range(0, 2):
+                bullets_state[i] = 'NORENDER'
     if pressed[pygame.K_ESCAPE]:
         done = True
     for event in pygame.event.get():
-
-        # key to control
-
         if event.type == pygame.QUIT: sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                for i in range(0, 2):
+                    if (bullets_state[i] == 'NORENDER' and ticks_to_ignore == 0):
+                        bullets_state[i] = 'RENDER'
+                        ticks_to_ignore = 2
+                bullet_state = 'RENDER'
+                x_bullet = x_pong - 5
+                y_bullet = y_pong - 40
 
     # drawing elements
     pygame.draw.rect(screen, red, wall_right)
     pygame.draw.rect(screen, red, wall_left)
-    bullet = pygame.Rect(x_bullet, y_bullet, 10, 10)
+    # bullet = pygame.Rect(x_bullet, y_bullet, 10, 10)
     enemy_rect = pygame.Rect(1080 / 2, 720 / 2, 10, 20)
     player_rect = pygame.Rect(x_pong, y_pong, 20, 30)
     player_rect.center = (x_pong, 700)
@@ -170,12 +173,10 @@ while not done:
     pygame.display.flip()
     screen.fill(black)
     # collisions
-    if pygame.Rect.colliderect(bullet, enemy_rect):
-        enemy_state = 'NOT_RENDER'
+    # if pygame.Rect.colliderect(bullet, enemy_rect):
+    #     enemy_state = 'NOT_RENDER'
 
     # Moving the bullet
-    if bullet_state == 'RENDER':
-        pygame.draw.rect(screen, red, bullet)
 
     if bullet_direction == 'UP':
         y_bullet -= bullet_velocity
@@ -191,14 +192,19 @@ while not done:
     if score >= ai_score + 5:
         won()
 
+    # mariusz.draw(x_bullet, y_bullet, bullet_state)
+    # bullets[0].draw(x_bullet, y_bullet, bullet_state)
+    for i in range (0,2):
+        bullets[i].draw(x_bullet, 700,bullets_state[i],i)
+        bullets[i].test(i)
+        if(bullets[i].returnY()==0):bullets_state[i]='NORENDER'
     # saving highest score to highest_score.txt
     f = open('highest_score.txt', 'w')
     f.write(str(highest_score))
     f.close()
 
+    if (ticks_to_ignore > 0): ticks_to_ignore -= 1
+    print(bullets_state)
+
     # FPS !!!!!
     fps_controller.tick(fps)
-
-    print(mariusz.draw())
-    if (mariusz.draw() <= 300):print('sprawdzam')
-
