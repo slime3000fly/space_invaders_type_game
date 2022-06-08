@@ -1,10 +1,12 @@
 # sapce invaiders game with pygame
 # By: angater1 and slime3000fly
+import random
 
 from Bullet import Bullet
 import pygame
 import sys
 from pygame import mixer
+import time
 
 pygame.init()
 pygame.display.init()
@@ -28,6 +30,11 @@ initial_x_pong = 1060
 initial_y_pong = 360
 initial_x_pong_2 = 5
 initial_y_pong_2 = 360
+
+enemy_x = 1080/2
+enemy_y = 720/2
+enemy_width = 20
+enemy_length = 20
 
 x_pong = 1080 / 2
 y_pong = 720
@@ -62,17 +69,17 @@ wall_left = pygame.Rect(0, 0, 5, 740)
 wall_right = pygame.Rect(1075, 0, 10, 740)
 
 # sound
-mixer.music.set_volume(0.1)
+mixer.music.set_volume(0.7)
 mixer.music.load('Simplicity(by damn so deep).mp3')
 mixer.music.play(-1)
-bang_sound = mixer.Sound('bang.wav')
-score_sound = mixer.Sound('score.wav')
+bang_sound = mixer.Sound('bow.ogg')
+score_sound = mixer.Sound('hit1.ogg')
 ai_score_sound = mixer.Sound('ai_score.wav')
 
 #TODO: Krzychu tu masz stowrzenie obiektu klasy bullet, tu muszisz wywoalyc dajac argumenty jakie to to sobie zoabcz
 #TODO: niektore maja domyslne wartosci inne nie,
 #TODO: w petli gry wywolujesz metode rysuj czyli masz mariusz.draw() i ona rysuje :)
-mariusz = Bullet(screen, 200, 400, 'UP', 800, 2000)
+mariusz = Bullet(screen, x_bullet, y_bullet, 'UP', 10, 10, 10)
 
 
 
@@ -143,9 +150,11 @@ while not done:
             x_pong += velocity
     if y_bullet < 0:
         if pressed[pygame.K_SPACE]:
+            bang_sound.play()
             bullet_state = 'RENDER'
             x_bullet = x_pong - 5
             y_bullet = y_pong - 40
+
     if pressed[pygame.K_ESCAPE]:
         done = True
     for event in pygame.event.get():
@@ -158,7 +167,8 @@ while not done:
     pygame.draw.rect(screen, red, wall_right)
     pygame.draw.rect(screen, red, wall_left)
     bullet = pygame.Rect(x_bullet, y_bullet, 10, 10)
-    enemy_rect = pygame.Rect(1080 / 2, 720 / 2, 10, 20)
+    enemy_rect = pygame.Rect(enemy_x, enemy_y, enemy_width, enemy_length)
+
     player_rect = pygame.Rect(x_pong, y_pong, 20, 30)
     player_rect.center = (x_pong, 700)
     pygame.draw.rect(screen, white, player_rect)
@@ -172,6 +182,19 @@ while not done:
     # collisions
     if pygame.Rect.colliderect(bullet, enemy_rect):
         enemy_state = 'NOT_RENDER'
+        score_sound.play()
+        score += 1
+
+    rx = random.randint(80, 1000)
+    ry = random.randint(80, 360)
+    rw = random.randint(15, 40)
+    rl = random.randint(15, 40)
+    if enemy_state == 'NOT_RENDER':
+        enemy_x = rx
+        enemy_y = ry
+        enemy_width = rw
+        enemy_length = rl
+        enemy_state = 'RENDER'
 
     # Moving the bullet
     if bullet_state == 'RENDER':
@@ -188,7 +211,7 @@ while not done:
 
     if ai_score >= score + 5:
         lose()
-    if score >= ai_score + 5:
+    if score >= ai_score + 30:
         won()
 
     # saving highest score to highest_score.txt
@@ -199,6 +222,5 @@ while not done:
     # FPS !!!!!
     fps_controller.tick(fps)
 
-    print(mariusz.draw())
-    if (mariusz.draw() <= 300):print('sprawdzam')
+
 
