@@ -22,16 +22,16 @@ f.close()
 # color
 black = (0, 0, 0)
 
-initial_x_pong = 1060
-initial_y_pong = 360
-initial_x_pong_2 = 5
-initial_y_pong_2 = 360
+initial_x_player = 1060
+initial_y_player = 360
+initial_x_player_2 = 5
+initial_y_player_2 = 360
 
-x_pong = 1080 / 2
-y_pong = 720
+x_player = 1080 / 2
+y_player = 720
 
-x_pong_2 = 5
-y_pong_2 = 360
+x_player_2 = 5
+y_player_2 = 360
 
 velocity = 5
 bullet_velocity = 30
@@ -125,16 +125,16 @@ while not done:
         if event.type == pygame.KEYDOWN:
             pygame.key.set_repeat(10)
             if event.key == pygame.K_LEFT:
-                if x_pong > 0 + 15:
-                    x_pong -= velocity
+                if x_player > 0 + 15:
+                    x_player -= velocity
             if event.key == pygame.K_RIGHT:
-                if x_pong < 1080 - 15:
-                    x_pong += velocity
+                if x_player < 1080 - 15:
+                    x_player += velocity
             if y_bullet < 0:
                 if event.key == pygame.K_SPACE:
                     bullet_state = 'RENDER'
-                    x_bullet = x_pong - 5
-                    y_bullet = y_pong - 40
+                    x_bullet = x_player - 5
+                    y_bullet = y_player - 40
             if event.key == pygame.K_ESCAPE:
                 done = True
         if event.type == pygame.QUIT: sys.exit()
@@ -142,8 +142,8 @@ while not done:
     # drawing elements
     pygame.draw.rect(screen, red, wall_right)
     pygame.draw.rect(screen, red, wall_left)
-    player_rect = pygame.Rect(x_pong, y_pong, 20, 30)
-    player_rect.center = (x_pong, 700)
+    player_rect = pygame.Rect(x_player, y_player, 20, 30)
+    player_rect.center = (x_player, 700)
     pygame.draw.rect(screen, white, player_rect)
 
     # drawing score
