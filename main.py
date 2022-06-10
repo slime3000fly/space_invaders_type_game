@@ -5,6 +5,7 @@ import sys
 import pygame
 from pygame import mixer
 from Bullet import Bullet
+from enemy import Enemy
 
 pygame.init()
 pygame.display.init()
@@ -32,9 +33,13 @@ enemy_state = 'RENDER'
 wall_left = pygame.Rect(0, 0, 5, 740)
 wall_right = pygame.Rect(1075, 0, 10, 740)
 
+#bullets
 bullets = [Bullet(screen, 700, 'UP', 10, 10, bullet_velocity), Bullet(screen, 700, 'UP', 10, 10, bullet_velocity)]
 bullets_state = ['NORENDER', 'NORENDER']
 ticks_to_ignore = 0  # variable to store number of ticks to ignore key reding
+
+#enemies
+enemies = [Enemy(screen,300,900)]
 
 # sound
 mixer.music.set_volume(0.1)
@@ -134,7 +139,7 @@ while not done:
     # drawing bullet and check colision
     for i in range(0, 2):
         if (bullets_state[i] == 'RENDER'):
-            if pygame.Rect.colliderect(bullets[i].draw(x_bullet, 700, bullets_state[i], i),
+            if pygame.Rect.colliderect(bullets[i].draw(x_bullet, 700, bullets_state[i]),
                                        enemy_rect):
                 enemy_state = 'NOT_RENDER'
         if (bullets[i].returnY() <= -1): bullets_state[i] = 'NORENDER'
@@ -153,3 +158,6 @@ while not done:
 
     # FPS !!!!!
     fps_controller.tick(fps)
+
+    enemies[0].draw(1000,500,player_rect)
+    print (enemies[0].check_colison())

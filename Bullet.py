@@ -1,5 +1,5 @@
 # class for bullet
-# class draw bullet and make it move up
+# method draw bullet and make it move up
 
 import pygame
 
@@ -16,12 +16,12 @@ class Bullet:
         self.bullet_velocity = bullet_velocity
         self.y = y_bullet
 
-    def draw(self, x_bullet=0, y_bullet=0, render='NOREDNER', color=1):
+    def draw(self, x_bullet=0, y_bullet=0, render='NOREDNER' ):
     #function to draw, it return bullet which is pygame.rect to colision check
         if (render == 'RENDER'):
             if self.y == y_bullet:
                 self.x = x_bullet
-            if self.y <= -1:
+            if self.y <= -1 or self.y >= 720:
                 self.y = y_bullet
                 self.x = x_bullet
                 # print('y', self.y)
@@ -32,7 +32,6 @@ class Bullet:
             # if (color == 0): c = orange
             self.bullet = pygame.Rect(self.x, self.y, self.width, self.lenght)
             pygame.draw.rect(self.screen, c, self.bullet)
-            print('y', self.y)
             if self.bullet_direction == 'UP':
                 self.y -= self.bullet_velocity
             if self.bullet_direction == 'DOWN':
