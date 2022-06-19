@@ -6,6 +6,7 @@ import pygame
 from pygame import mixer
 from Bullet import Bullet
 from enemy import Enemy
+from house import House
 
 pygame.init()
 pygame.display.init()
@@ -22,9 +23,10 @@ f.close()
 
 x_player = 1080 / 2
 y_player = 720
+x_bullet = 0
 
 velocity = 3
-bullet_velocity = 5
+bullet_velocity = 2
 
 fps = 120
 
@@ -39,9 +41,20 @@ bullets_state = ['NORENDER', 'NORENDER']
 ticks_to_ignore = 0  # variable to store number of ticks to ignore key reding
 
 # enemies
-enemies = [Enemy(screen, 300, 900, 1000, 800), Enemy(screen, 300, 500, 600, 400), Enemy(screen, 300, 100, 200, 0)]
-enemy = [0] * 3
-enemy_state = ['RENDER'] * 3
+number_of_enemies = 15
+enemies_y = 400
+enemies = [Enemy(screen, enemies_y, i*50, 1000, 0) for i in range(number_of_enemies)]
+enemy = [0] * number_of_enemies
+enemy_state = ['RENDER'] * number_of_enemies
+enemy_bullet = [Bullet(screen, enemies_y, 'DOWN', 10, 10, bullet_velocity) for i in range(3)]
+enemy_bullet_status = ['NORENDER'] * 3
+
+# house
+houses_y = 500
+houses = [House(screen, houses_y, 900), House(screen, houses_y, 500), House(screen, houses_y, 100)]
+houses_health = [10] * 3
+hou = [0] * 3
+ticks = 0
 
 # sound
 mixer.music.set_volume(0.1)
@@ -123,7 +136,7 @@ while not done:
         for i in range(0, 2):
             if (bullets_state[i] == 'NORENDER' and ticks_to_ignore == 0):
                 bullets_state[i] = 'RENDER'
-                ticks_to_ignore = 10
+                ticks_to_ignore = 20
                 x_bullet = x_player - 5
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
@@ -136,22 +149,45 @@ while not done:
     player_rect.center = (x_player, 700)
     pygame.draw.rect(screen, white, player_rect)
 
-    # drawin enemies
-    for i in range(0, 3):
-        enemy[i] = enemies[i].draw(player_rect, enemy_state[i])
-
-    # drawing bullet and check colision
+    # drawing player's bullet and check colision with enemies and houses
     for i in range(0, 2):
+        bullets[i].draw(x_bullet, 700, bullets_state[i])
         if (bullets_state[i] == 'RENDER'):
             for b in range(0, 3):
-                if pygame.Rect.colliderect(bullets[i].draw(x_bullet, 700, bullets_state[i]),
-                                           enemy[b]):
-                    enemy_state[b] = 'NOT_RENDER'
+                if pygame.Rect.colliderect(bullets[i].check_colison(), enemy[b]):
+                    enemy_state[b] = 'NORENDER'
+                    bullets_state[i] = 'NORENDER'
+                if houses_health[b] > 0:
+                    if pygame.Rect.colliderect(hou[b], bullets[i].check_colison()):
+                        bullets_state[i] = 'NORENDER'
+                        houses_health[b] -= 1
+                        ticks_to_ignore += 5
         if (bullets[i].returnY() <= -1): bullets_state[i] = 'NORENDER'
+
+    #drawing houses
+    for i in range (0,3):
+        hou[i] = houses[i].draw(houses_health[i])
+
+    # drawing enemies
+    for i in range(0,number_of_enemies):
+        enemy[i] = enemies[i].draw(enemy_state[i])
+
+    # drawing enemies bullet
+    for i in range(0, 3):
+        if enemies[i].return_if_x_is_max():
+            enemy_bullet_status[i] = 'RENDER'
+    for i in range(0, 3):
+        enemy_bullet[i].draw(enemies[i].return_current_x(), 400, enemy_bullet_status[i])
+        if (enemy_bullet[i].returnY() >= 720): enemy_bullet_status[i] = 'NORENDER'
 
     # check if enemy hit player
     for i in range(0, 3):
-        if (enemies[i].check_colison()): lose()
+        if (pygame.Rect.colliderect(enemy_bullet[i].check_colison(), player_rect)): lose()
+        if (enemy_bullet_status[i] == 'RENDER'):
+            if houses_health[i] > 0:
+                if (pygame.Rect.colliderect(enemy_bullet[i].check_colison(), hou[i])):
+                    houses_health[i] -= 1
+                    enemy_bullet_status[i] = 'NORENDER'
 
     # drawing score
     show_score(1, white, 'times new roman', 20)
@@ -159,6 +195,7 @@ while not done:
     screen.fill(black)
 
     if (ticks_to_ignore > 0): ticks_to_ignore -= 1
+    if (ticks > 0): ticks -= 1
 
     # saving highest score to highest_score.txt
     f = open('highest_score.txt', 'w')
