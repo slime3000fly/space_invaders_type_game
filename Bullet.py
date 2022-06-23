@@ -29,6 +29,7 @@ class Bullet:
                 self.y = y_bullet
                 self.x = x_bullet
 
+
             red = pygame.Color(139, 0, 0)
             orange = (255, 100, 0)
             c = orange

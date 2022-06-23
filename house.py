@@ -16,6 +16,7 @@ class House:
         self.x = x_house
         self.width = width
         self.lenght = lenght
+        self.img = pygame.image.load('House.png')
 
 
     def draw(self,health ,render='RENDER'):
@@ -24,7 +25,7 @@ class House:
         if (render == 'RENDER'):
             #drawing house
             self.house = pygame.Rect(self.x, self.y, self.width, self.lenght)
-            pygame.draw.rect(self.screen, self.pink, self.house)
+            self.screen.blit(self.img,(self.x,self.y))
 
         return self.house
 
