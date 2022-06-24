@@ -41,6 +41,9 @@ bullets = [Bullet(screen, 700, 'UP', 10, 10, bullet_velocity), Bullet(screen, 70
 bullets_state = ['NORENDER', 'NORENDER']
 ticks_to_ignore = 0  # variable to store number of ticks to ignore key reading
 
+playerImg = pygame.image.load('Player.png')
+background = pygame.image.load('Background.png')
+
 # enemies
 number_of_enemies = 46
 enemies_y = [40, 450, 0]
@@ -139,9 +142,9 @@ def render_enemy_bullet():
         if enemy_state.count('RENDER') > 3:
             if enemies[i].return_if_x_is_max():
                 for z in range(3):
-                    value[z] = random.randrange(len(enemy_state))
+                    value[z] = random.randrange(len(enemy_state)-1)
                     if value[z] in value:
-                        value[z] = random.randrange(len(enemy_state))
+                        value[z] = random.randrange(len(enemy_state)-1)
 
                 for o in range(3):
                     trash[o] = enemy_state[value[o]]
@@ -161,6 +164,9 @@ def render_enemy_bullet():
             for d in range(3):
                 enemy_bullet_status[d] = 'RENDER'
     for z in range(3):
+        print('value',value[z])
+        print('len',len(enemies))
+        print(enemies[value[z]].return_current_x())
         enemy_bullet[z].draw(enemies[value[z]].return_current_x(), enemies_y[2], enemy_bullet_status[z])
 
 
@@ -182,7 +188,7 @@ while not done:
             if (bullets_state[i] == 'NORENDER' and ticks_to_ignore == 0):
                 bullets_state[i] = 'RENDER'
                 ticks_to_ignore = 20
-                x_bullet = x_player - 5
+                x_bullet = x_player
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
@@ -190,13 +196,14 @@ while not done:
     pygame.draw.rect(screen, red, wall_right)
     pygame.draw.rect(screen, red, wall_left)
     enemy_rect = pygame.Rect(1080 / 2, 720 / 2, 10, 20)
-    player_rect = pygame.Rect(x_player, y_player, 20, 30)
+    player_rect = pygame.Rect(x_player, y_player, 15, 30)
     player_rect.center = (x_player, 700)
-    pygame.draw.rect(screen, white, player_rect)
+    # pygame.draw.rect(screen, white, player_rect)
+    screen.blit(playerImg, (x_player-7.5, 680))
 
     # drawing player's bullet and check colision with enemies and houses
     for i in range(0, 2):
-        bullets[i].draw(x_bullet, 700, bullets_state[i])
+        bullets[i].draw(x_bullet, 680, bullets_state[i])
         if (bullets_state[i] == 'RENDER'):
             for b in range(0, 3):
                 if houses_health[b] > 0:
@@ -250,6 +257,7 @@ while not done:
     show_score(1, white, 'times new roman', 20)
     pygame.display.flip()
     screen.fill(black)
+    screen.blit(background,(0,0))
 
     if (ticks_to_ignore > 0): ticks_to_ignore -= 1
 
