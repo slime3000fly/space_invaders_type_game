@@ -3,6 +3,7 @@
 
 import sys
 import pygame
+import random
 from pygame import mixer
 from Bullet import Bullet
 from enemy import Enemy
@@ -38,23 +39,33 @@ wall_right = pygame.Rect(1075, 0, 10, 740)
 # bullets
 bullets = [Bullet(screen, 700, 'UP', 10, 10, bullet_velocity), Bullet(screen, 700, 'UP', 10, 10, bullet_velocity)]
 bullets_state = ['NORENDER', 'NORENDER']
-ticks_to_ignore = 0  # variable to store number of ticks to ignore key reding
+ticks_to_ignore = 0  # variable to store number of ticks to ignore key reading
 
 # enemies
-number_of_enemies = 15
-enemies_y = 400
-enemies = [Enemy(screen, enemies_y, i*50, 1000, 0) for i in range(number_of_enemies)]
-enemy = [0] * number_of_enemies
+number_of_enemies = 46
+enemies_y = [40, 450, 0]
+enemy = [0] * 50
 enemy_state = ['RENDER'] * number_of_enemies
-enemy_bullet = [Bullet(screen, enemies_y, 'DOWN', 10, 10, bullet_velocity) for i in range(3)]
-enemy_bullet_status = ['NORENDER'] * 3
+enemy_bullet = [Bullet(screen, -100, 'DOWN', 10, 10, bullet_velocity) for i in range(5)]
+enemy_bullet_status = ['NORENDER' for i in range(3)]
+enemy_direction = 'LEFT'
+enemy_x = [0] * number_of_enemies
+
+# creating enemy type object
+enemies = [Enemy(screen, i * 50 + 200, 1040, 0) for i in range(15)]
+for i in range(number_of_enemies):
+    if i > 15 and i <= 30:
+        enemies.append(Enemy(screen, (i - 16) * 50 + 200, 1040, 0))
+    if i > 30:
+        enemies.append(Enemy(screen, (i - 31) * 50 + 200, 1040, 0))
 
 # house
 houses_y = 500
 houses = [House(screen, houses_y, 900), House(screen, houses_y, 500), House(screen, houses_y, 100)]
-houses_health = [10] * 3
+houses_health = [4] * 3
 hou = [0] * 3
-ticks = 0
+
+ticku = 0
 
 # sound
 mixer.music.set_volume(0.1)
@@ -119,6 +130,40 @@ def won():
         pygame.display.update()
 
 
+value = [0, 0, 0]
+trash = [0, 0, 0]
+
+
+def render_enemy_bullet():
+    for i in range(number_of_enemies - 1):
+        if enemy_state.count('RENDER') > 3:
+            if enemies[i].return_if_x_is_max():
+                for z in range(3):
+                    value[z] = random.randrange(len(enemy_state))
+                    if value[z] in value:
+                        value[z] = random.randrange(len(enemy_state))
+
+                for o in range(3):
+                    trash[o] = enemy_state[value[o]]
+
+                while True:
+                    if 'NORENDER' in trash:
+                        guu = trash.index('NORENDER')
+                        value[guu] = random.randrange(len(enemy_state))
+                        trash[guu] = enemy_state[value[guu]]
+                    else:
+                        break
+        else:
+            value[0] = enemy_state.index('RENDER')
+
+    for i in range(45):
+        if enemies[i].return_if_x_is_max():
+            for d in range(3):
+                enemy_bullet_status[d] = 'RENDER'
+    for z in range(3):
+        enemy_bullet[z].draw(enemies[value[z]].return_current_x(), enemies_y[2], enemy_bullet_status[z])
+
+
 done = False
 
 while not done:
@@ -154,40 +199,52 @@ while not done:
         bullets[i].draw(x_bullet, 700, bullets_state[i])
         if (bullets_state[i] == 'RENDER'):
             for b in range(0, 3):
-                if pygame.Rect.colliderect(bullets[i].check_colison(), enemy[b]):
-                    enemy_state[b] = 'NORENDER'
-                    bullets_state[i] = 'NORENDER'
                 if houses_health[b] > 0:
                     if pygame.Rect.colliderect(hou[b], bullets[i].check_colison()):
                         bullets_state[i] = 'NORENDER'
                         houses_health[b] -= 1
                         ticks_to_ignore += 5
+            for b in range(0, number_of_enemies - 1):
+                if enemy_state[b] == 'RENDER':
+                    if pygame.Rect.colliderect(bullets[i].check_colison(), enemy[b]):
+                        enemy_state[b] = 'NORENDER'
+                        bullets_state[i] = 'NORENDER'
+
         if (bullets[i].returnY() <= -1): bullets_state[i] = 'NORENDER'
 
-    #drawing houses
-    for i in range (0,3):
+    # drawing houses
+    for i in range(0, 3):
         hou[i] = houses[i].draw(houses_health[i])
 
     # drawing enemies
-    for i in range(0,number_of_enemies):
-        enemy[i] = enemies[i].draw(enemy_state[i])
+    for i in range(0, number_of_enemies - 1):
+        if i < 15: c = 0
+        if i >= 15 and i < 30: c = 1
+        if i >= 30 and i <= 46: c = 2
+        enemy[i] = enemies[i].draw(enemy_state[i], enemy_direction, enemies_y[c], enemy_x[i])
+        if enemies[i].return_current_x() <= 20:
+            enemy_direction = 'RIGHT'
+            enemies_y[0] += 15
+        if enemies[i].return_current_x() >= 1040:
+            enemy_direction = 'LEFT'
+            enemies_y[0] += 15
+    enemies_y[1] = enemies_y[0] + 50
+    enemies_y[2] = enemies_y[1] + 50
 
     # drawing enemies bullet
-    for i in range(0, 3):
-        if enemies[i].return_if_x_is_max():
-            enemy_bullet_status[i] = 'RENDER'
-    for i in range(0, 3):
-        enemy_bullet[i].draw(enemies[i].return_current_x(), 400, enemy_bullet_status[i])
-        if (enemy_bullet[i].returnY() >= 720): enemy_bullet_status[i] = 'NORENDER'
+    render_enemy_bullet()
 
-    # check if enemy hit player
+    # check if plyer lose
     for i in range(0, 3):
-        if (pygame.Rect.colliderect(enemy_bullet[i].check_colison(), player_rect)): lose()
-        if (enemy_bullet_status[i] == 'RENDER'):
-            if houses_health[i] > 0:
-                if (pygame.Rect.colliderect(enemy_bullet[i].check_colison(), hou[i])):
-                    houses_health[i] -= 1
-                    enemy_bullet_status[i] = 'NORENDER'
+        if pygame.Rect.colliderect(enemy_bullet[i].check_colison(), player_rect): lose()
+        if enemy_bullet_status[i] == 'RENDER':
+            for d in range(3):
+                if houses_health[d] > 0:
+                    if pygame.Rect.colliderect(enemy_bullet[i].check_colison(), hou[d]):
+                        houses_health[d] -= 1
+                        print(houses_health[d])
+                        enemy_bullet_status[i] = 'NORENDER'
+    if enemies_y[1] >= 620: lose()
 
     # drawing score
     show_score(1, white, 'times new roman', 20)
@@ -195,7 +252,8 @@ while not done:
     screen.fill(black)
 
     if (ticks_to_ignore > 0): ticks_to_ignore -= 1
-    if (ticks > 0): ticks -= 1
+
+    if (ticku >= 0): ticku -= 1
 
     # saving highest score to highest_score.txt
     f = open('highest_score.txt', 'w')
