@@ -42,7 +42,7 @@ bullets_state = ['NORENDER', 'NORENDER']
 ticks_to_ignore = 0  # variable to store number of ticks to ignore key reading
 
 playerImg = pygame.image.load('Player.png')
-background = pygame.image.load('Background.png')
+background = pygame.image.load('background.jpg')
 
 # enemies
 number_of_enemies = 46
@@ -91,9 +91,9 @@ black = (0, 0, 0)
 # function declaration
 def show_score(choice, color, font, size):
     score_font = pygame.font.SysFont(font, size)
-    score_surface = score_font.render('  Player: ' + str(score) + '  Highest Score : ' + str(highest_score), True,
-                                      color)
-
+    score_surface = score_font.render('  Player: ' + str(score) + '  Highest Score : ' + str(highest_score), True, color)
+    score_rect = score_surface.get_rect()
+    screen.blit(score_surface, score_rect)
 
 def lose():
     # function which play after lose game
@@ -142,9 +142,9 @@ def render_enemy_bullet():
         if enemy_state.count('RENDER') > 3:
             if enemies[i].return_if_x_is_max():
                 for z in range(3):
-                    value[z] = random.randrange(len(enemy_state)-1)
+                    value[z] = random.randrange(44)
                     if value[z] in value:
-                        value[z] = random.randrange(len(enemy_state)-1)
+                        value[z] = random.randrange(44)
 
                 for o in range(3):
                     trash[o] = enemy_state[value[o]]
@@ -152,7 +152,7 @@ def render_enemy_bullet():
                 while True:
                     if 'NORENDER' in trash:
                         guu = trash.index('NORENDER')
-                        value[guu] = random.randrange(len(enemy_state))
+                        value[guu] = random.randrange(44)
                         trash[guu] = enemy_state[value[guu]]
                     else:
                         break
@@ -216,6 +216,7 @@ while not done:
                     if pygame.Rect.colliderect(bullets[i].check_colison(), enemy[b]):
                         enemy_state[b] = 'NORENDER'
                         bullets_state[i] = 'NORENDER'
+                        score +=1
 
         if (bullets[i].returnY() <= -1): bullets_state[i] = 'NORENDER'
 
@@ -270,3 +271,8 @@ while not done:
 
     # FPS !!!!!
     fps_controller.tick(fps)
+#guwno
+#zjedz jerowno
+#masznatwarzyiciepaczymordo
+#guwnooooooooo
+#twoja stara = oktylion kg
